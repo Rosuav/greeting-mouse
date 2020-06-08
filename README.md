@@ -7,7 +7,7 @@ Tweaks your Twitch chat to show a highlight on the first message from any
 person.
 
 Icon from https://www.iconfinder.com/icons/1276855/message_misc_icon
-and available under CC-BY-3.0.
+and available under CC-BY-3.0. Created by Craft Icons.
 
 To update:
 1. Bump the version number in the manifest
