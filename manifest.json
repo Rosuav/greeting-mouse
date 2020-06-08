@@ -1,0 +1,13 @@
+{
+	"manifest_version": 2,
+	"name": "Greeting Mouse",
+	"description": "Highlight the first message from anyone",
+	"version": "0.0.1",
+	"content_scripts": [
+		{
+			"matches": ["https://*.twitch.tv/*"],
+			"css": ["highlighter.css"],
+			"js": ["highlighter.js"]
+		}
+	]
+}

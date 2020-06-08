@@ -1,0 +1,5 @@
+/* Highlight any given person's first message */
+.first-message {
+	border: 1px solid green;
+	background: #00FF0010;
+}
