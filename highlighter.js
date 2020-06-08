@@ -3,9 +3,6 @@ It'll need to remember this in LocalStorage, or maybe some other
 config system (what's best prac for extensions?). Have a context
 menu entry or activation that toggles it.
 */
-const base = document.querySelector(".chat-scrollable-area__message-container");
-//TODO: What if base doesn't yet exist? Wait for it?
-
 const seen = {};
 function fix() {
 	//Scan all children and see what names they have.
@@ -23,7 +20,16 @@ function fix() {
 	});
 }
 
-fix(); //Do the fixes immediately on startup
-
-//Also call fix() any time it appears that a message has been posted.
-if (base) new MutationObserver(fix).observe(base, {childList: true, subtree: true});
+//Attempt to find the stream chat container. If it isn't there, retry a few
+//times in an attempt to let it load; otherwise, just abandon it.
+function setup(maxretry) {
+	const base = document.querySelector(".stream-chat");
+	if (base) {
+		console.info("Greeting Mouse active and ready to highlight first messages.");
+		fix();
+		new MutationObserver(fix).observe(base, {childList: true, subtree: true});
+		return;
+	}
+	if (maxretry > 0) setTimeout(setup, 2000, maxretry - 1);
+}
+setup(5);
