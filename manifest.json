@@ -3,6 +3,7 @@
 	"name": "Greeting Mouse",
 	"description": "Highlight the first message from anyone",
 	"version": "0.0.1",
+	"permissions": ["storage"],
 	"content_scripts": [
 		{
 			"matches": ["https://*.twitch.tv/*"],
