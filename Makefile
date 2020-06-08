@@ -1,2 +1,2 @@
-upload.zip: manifest.json *.js *.css
+upload.zip: manifest.json *.js *.css *.png
 	zip $@ $?
