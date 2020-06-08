@@ -4,6 +4,7 @@
 	"description": "Highlight the first message from anyone",
 	"version": "0.0.1",
 	"permissions": ["storage"],
+	"icons": {"128": "icon128.png"},
 	"content_scripts": [
 		{
 			"matches": ["https://*.twitch.tv/*"],
