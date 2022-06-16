@@ -1,8 +1,3 @@
-/* TODO: Allow configuration of which pages this is active on.
-It'll need to remember this in LocalStorage, or maybe some other
-config system (what's best prac for extensions?). Have a context
-menu entry or activation that toggles it.
-*/
 const seen = {};
 let active = false;
 const key = document.URL; //In case it ever changes.
@@ -31,7 +26,7 @@ let pristine = true;
 function setup(maxretry) {
 	const base = document.querySelector(".stream-chat");
 	if (base) {
-		console.info("Greeting Mouse active and ready to highlight first messages.");
+		if (active) console.info("Greeting Mouse active and ready to highlight first messages.");
 		fix();
 		new MutationObserver(fix).observe(base, {childList: true, subtree: true});
 		return;
@@ -51,19 +46,11 @@ chrome.storage.local.get(["date+" + key, "users+" + key], info => {
 	if (+info["date+" + key] > +new Date() - 3600000 * 4)
 		info["users+" + key].forEach(user => seen[user] = true);
 });
-
-function toggle() {
+chrome.runtime.onMessage.addListener(r => {
 	chrome.storage.sync.get(key, info => {
-		active = !info[key];
-		chrome.storage.sync.set({[key]: active});
-		if (active) console.log("Now active on this URL. Will highlight everyone's first messages.");
-		else console.log("Deactivated for this URL. Back to normal.");
+		active = !!info[key];
 		init();
+		if (active) console.log("Greeting Mouse now active - first messages will be highlighted.");
+		else console.log("Greeting Mouse deactivated.");
 	});
-}
-
-const nonce = Math.random(); //Unlikely to get a collision
-window.addEventListener("message", event => event.data.nonce === nonce && toggle());
-const scr = document.createElement("script");
-scr.innerHTML = 'window.greet = () => window.postMessage({nonce: ' + nonce + '});';
-document.body.appendChild(scr);
+});
