@@ -5,6 +5,7 @@ menu entry or activation that toggles it.
 */
 const seen = {};
 let active = false;
+const key = document.URL; //In case it ever changes.
 function fix() {
 	if (!active) return;
 	//Scan all children and see what names they have.
@@ -19,7 +20,9 @@ function fix() {
 		seen[user] = true;
 		msg.classList.add("first-message");
 		//console.log(msg);
+		chrome.storage.local.set({["users+" + key]: Object.keys(seen)});
 	});
+	chrome.storage.local.set({["date+" + key]: +new Date});
 }
 
 //Attempt to find the stream chat container. If it isn't there, retry a few
@@ -38,10 +41,15 @@ function setup(maxretry) {
 }
 function init() {if (active && pristine) {pristine = false; setup(5);}}
 
-const key = document.URL; //In case it ever changes.
 chrome.storage.sync.get(key, info => {
 	active = !!info[key];
 	init();
+});
+chrome.storage.local.get(["date+" + key, "users+" + key], info => {
+	//If messages have been seen within the last four hours, retain the
+	//list of seen users, otherwise leave it empty.
+	if (+info["date+" + key] > +new Date() - 3600000 * 4)
+		info["users+" + key].forEach(user => seen[user] = true);
 });
 
 function toggle() {
