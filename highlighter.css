@@ -3,3 +3,9 @@
 	border: 1px solid green;
 	background: #00FF0010;
 }
+
+/* The highlight can clash with the "First Time Chat" marker,
+which wraps the actual chat message up a bit */
+.first-message.chat-line--inline {
+	display: block;
+}
