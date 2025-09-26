@@ -43,8 +43,12 @@ chrome.storage.sync.get(key, info => {
 chrome.storage.local.get(["date+" + key, "users+" + key], info => {
 	//If messages have been seen within the last four hours, retain the
 	//list of seen users, otherwise leave it empty.
-	if (+info["date+" + key] > +new Date() - 3600000 * 4)
+	console.log("Greeting Mouse schedule check:", +info["date+" + key], ">", +new Date() - 3600000 * 4);
+	if (+info["date+" + key] > +new Date() - 3600000 * 4) {
+		console.log("Greeting Mouse retaining users", info["users+" + key]);
 		info["users+" + key].forEach(user => seen[user] = true);
+	} else
+		console.log("Greeting Mouse not retaining users", info["users+" + key]);
 });
 chrome.runtime.onMessage.addListener(r => {
 	chrome.storage.sync.get(key, info => {
