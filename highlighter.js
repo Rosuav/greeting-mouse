@@ -1,6 +1,7 @@
 const seen = {};
 let active = false;
 const key = document.URL; //In case it ever changes.
+const TIMEOUT = 3600000 * 8; //After this long, people will be highlighted again
 function fix() {
 	if (!active) return;
 	//Scan all children and see what names they have.
@@ -11,13 +12,12 @@ function fix() {
 		const dispname = msg.querySelector(".chat-author__display-name");
 		if (!dispname) return;
 		const user = dispname.innerText.trim();
-		if (seen[user]) return;
-		seen[user] = true;
+		if (seen[user] && seen[user] > +new Date - TIMEOUT) return;
+		seen[user] = +new Date;
 		msg.classList.add("first-message");
 		//console.log(msg);
-		chrome.storage.local.set({["users+" + key]: Object.keys(seen)});
+		chrome.storage.local.set({["users+" + key]: seen});
 	});
-	chrome.storage.local.set({["date+" + key]: +new Date});
 }
 
 //Attempt to find the stream chat container. If it isn't there, retry a few
@@ -40,15 +40,14 @@ chrome.storage.sync.get(key, info => {
 	active = !!info[key];
 	init();
 });
-chrome.storage.local.get(["date+" + key, "users+" + key], info => {
+chrome.storage.local.get(["users+" + key], info => {
 	//If messages have been seen within the last four hours, retain the
 	//list of seen users, otherwise leave it empty.
-	console.log("Greeting Mouse schedule check:", +info["date+" + key], ">", +new Date() - 3600000 * 4);
-	if (+info["date+" + key] > +new Date() - 3600000 * 4) {
-		console.log("Greeting Mouse retaining users", info["users+" + key]);
-		info["users+" + key].forEach(user => seen[user] = true);
-	} else
-		console.log("Greeting Mouse not retaining users", info["users+" + key]);
+	const cutoff = +new Date() - TIMEOUT;
+	console.log("Greeting Mouse schedule check:", cutoff);
+	if (Array.isArray(info["users+" + key])) return; //Legacy - individual timestamps not recorded. Ignoring this.
+	Object.entries(info["users+" + key]).forEach(([user, ts]) => ts > cutoff && (seen[user] = ts));
+	console.log("Retaining users:", seen);
 });
 chrome.runtime.onMessage.addListener(r => {
 	chrome.storage.sync.get(key, info => {
